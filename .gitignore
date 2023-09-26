@@ -1,0 +1,10 @@
+package-lock.json
+node_modules/
+tmp/profile*.json
+test/*.task
+todo/*.task
+data/*.url
+data/*.jpg
+data/*.jpeg
+data/*.png
+data/*.txt

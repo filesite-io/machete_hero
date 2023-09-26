@@ -1,0 +1,9 @@
+{
+  "name": "machege-hero",
+  "type": "module",
+  "dependencies": {
+    "@ulixee/cloud": "^2.0.0-alpha.24",
+    "@ulixee/hero": "^2.0.0-alpha.24",
+    "node-cron": "^3.0.2"
+  }
+}
