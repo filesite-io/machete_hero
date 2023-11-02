@@ -2,7 +2,7 @@
 
 Hero scripts of machete.
 
-本项目基于Node.js和开源工具Hero（官网：https://ulixee.org）。
+本项目基于Node.js和开源工具Hero（[Ulixee官网](https://ulixee.org)）。
 
 
 支持以下平台视频分享网页数据抓取：
