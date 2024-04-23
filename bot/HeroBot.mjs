@@ -1,36 +1,34 @@
 import Hero from '@ulixee/hero';
-import configs from '../config.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'url';
 import ClientLogPlugin from '../plugin/ClientLogPlugin.mjs';
 
 class HeroBot {
-  constructor(heroCloudServer) {
-    this.heroServer = heroCloudServer ? heroCloudServer : '';
+    constructor(heroCloudServer) {
+        this.heroServer = heroCloudServer ? heroCloudServer : '';
 
-    this.supportedBots = {
-        douyin: 'https://www.douyin.com',
-        kuaishou: 'https://www.kuaishou.com',
-        xigua: 'https://www.ixigua.com',
-        bilibili: 'https://www.bilibili.com',
-    };
+        this.supportedBots = {
+            douyin: 'https://www.douyin.com',
+            kuaishou: 'https://www.kuaishou.com',
+            xigua: 'https://www.ixigua.com',
+            bilibili: 'https://www.bilibili.com',
+        };
 
-    this.name = '';
+        this.name = '';
 
-    const __filename = fileURLToPath(import.meta.url);
-    this.root = path.dirname(__filename);
-  }
-
-  //返回profile对象
-  async init(botName) {
-    if (typeof(this.supportedBots[botName]) == 'undefined') {
-        return false;
+        const __filename = fileURLToPath(import.meta.url);
+        this.root = path.dirname(__filename);
     }
 
-    const base_url = this.supportedBots[botName];
+    //返回profile对象
+    async init(botName) {
+        if (typeof(this.supportedBots[botName]) == 'undefined') {
+            return false;
+        }
 
-    try {
+        const base_url = this.supportedBots[botName];
+
         this.name = botName;
 
         let options = {
@@ -49,62 +47,64 @@ class HeroBot {
         }
 
         //console.log('Hero init配置', configs);
-
         const hero = new Hero(options);
-        hero.use(ClientLogPlugin);          //开启log
-        await hero.goto(base_url, configs.heroBotOptions);
 
-        //等待所有内容加载完成
-        const tab = await hero.activeTab;
-        await tab.waitForLoad('AllContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
+        try {
+            hero.use(ClientLogPlugin);          //开启log
+            await hero.goto(base_url, configs.heroBotOptions);
 
-        //保存profile
-        const latestUserProfile = await hero.exportUserProfile();
-        this.saveProfile(latestUserProfile);
+            //等待所有内容加载完成
+            const tab = await hero.activeTab;
+            await tab.waitForLoad('AllContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
 
-        await hero.close();
+            //保存profile
+            const latestUserProfile = await hero.exportUserProfile();
+            this.saveProfile(latestUserProfile);
 
-        return latestUserProfile;
-    }catch(error) {
-        console.error("Error got when request %s via hero: %s", base_url, error);
-    }
+            await hero.close();
 
-    return false;
-  }
+            return latestUserProfile;
+        }catch(error) {
+            console.error("Error got when bot init with %s via hero, error: %s", base_url, error);
+            await hero.close();
+        }
 
-  //保存profile
-  saveProfile(profile) {
-    if (this.name == '') {return false;}
-
-    const botName = this.name;
-
-    try {
-        //保存profile
-        const profilePath = path.resolve(this.root, '../tmp/', `profile_${botName}.json`);
-        profile = this.fixCookies(profile);
-        fs.writeFileSync(profilePath, JSON.stringify(profile, null, 2));
-    }catch(error) {
-        console.error("Error got when save profile of %s, error detail:\n%s", botName, error);
         return false;
     }
 
-    return true;
-  }
+    //保存profile
+    saveProfile(profile) {
+        if (this.name == '') {return false;}
 
-  //处理name为空的cookie
-  fixCookies(profile) {
-    let fixedProfile = profile;
-    if (typeof(profile.cookies) == 'undefined') {return profile;}
+        const botName = this.name;
 
-    const botName = this.name;
-    for (const index in profile.cookies) {
-        if (profile.cookies[index].name == '') {
-            fixedProfile.cookies[index].name = botName;
+        try {
+            //保存profile
+            const profilePath = path.resolve(this.root, '../tmp/', `profile_${botName}.json`);
+            profile = this.fixCookies(profile);
+            fs.writeFileSync(profilePath, JSON.stringify(profile, null, 2));
+        }catch(error) {
+            console.error("Error got when save profile of %s, error detail:\n%s", botName, error);
+            return false;
         }
+
+        return true;
     }
 
-    return fixedProfile;
-  }
+    //处理name为空的cookie
+    fixCookies(profile) {
+        let fixedProfile = profile;
+        if (typeof(profile.cookies) == 'undefined') {return profile;}
+
+        const botName = this.name;
+        for (const index in profile.cookies) {
+            if (profile.cookies[index].name == '') {
+                fixedProfile.cookies[index].name = botName;
+            }
+        }
+
+        return fixedProfile;
+    }
 
 }
 

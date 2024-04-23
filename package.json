@@ -1,9 +1,14 @@
 {
-  "name": "machege-hero",
-  "type": "module",
-  "dependencies": {
-    "@ulixee/cloud": "^2.0.0-alpha.24",
-    "@ulixee/hero": "^2.0.0-alpha.24",
-    "node-cron": "^3.0.2"
-  }
+    "name": "machege-hero",
+    "type": "module",
+    "dependencies": {
+        "@ulixee/cloud": "^2.0.0-alpha.24",
+        "@ulixee/hero": "^2.0.0-alpha.24",
+        "node-cron": "^3.0.2",
+        "axios": "^1.3.3",
+        "md5": "^2.3.0"
+    },
+    "scripts": {
+        "start": "node spider.mjs"
+    }
 }

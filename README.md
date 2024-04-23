@@ -37,13 +37,14 @@ Hero scripts of machete.
 
 ## 使用方法
 
-1. 下载本源码到本地后，进入项目根目录；
+1. 下载本源码到本地后，进入项目根目录
 ```
 git clone "https://git.filesite.io/filesite/machete_hero.git"
 cd machete_hero/
 ```
 
-2. 执行下面命令安装依赖包：
+
+2. 执行下面命令安装依赖包
 ```
 npm install
 ```
@@ -51,8 +52,24 @@ npm install
 如果你对npm和node不熟悉，请自行了解。
 
 
-3. 写一个.mjs脚本，调用bot/下的类库，实现目标网页访问和解析获取所需数据。
+3. 执行下面命令启动爬虫
+```
+npm start
+```
+
+带参数启动，设置自定义配置文件，覆盖默认的config.mjs
+```
+npm start -- config_custom.json
+```
+
+在目录todo/里创建任务文件，爬虫检测到新任务后自动抓取数据并保存到data/目录下。
+
+
+4. 二次开发
+
+写一个.mjs脚本，调用bot/下的类库，实现目标网页访问和解析获取所需数据。
+
+还可以参考bot/下的类库，实现对任意网站的数据抓取。
 
 bot/目录下的类库调用方法，可参考test/scrap_test.mjs测试脚本，
 测试脚本使用方法见test/README.md文档。
-

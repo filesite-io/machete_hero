@@ -1,11 +1,15 @@
 /**
  * 爬虫主程序
  * 负责监听任务目录里的新任务，并自动抓取数据保存到数据目录。
+ * 增加失败任务的重试机制
+ * 增加失败任务上报
+ * 增加任务处理超时
  */
-import configs from './config.mjs';
+import getConfigs from './config.mjs';
 import common from './lib/common.mjs';
 import TaskMoniter from "./lib/taskMoniter.mjs";
 import TaJian from "./lib/tajian.mjs";
+import HeroBot from "./lib/heroBot.mjs";
 
 import Douyin from './bot/Douyin.mjs';
 import Kuaishou from './bot/Kuaishou.mjs';
@@ -13,25 +17,52 @@ import Xigua from './bot/Xigua.mjs';
 import Bilibili from './bot/Bilibili.mjs';
 
 import cron from 'node-cron';
+import path from 'node:path';
 
 (async () => {
+    //设置configs为全局变量
+    global.configs = await getConfigs();
 
     const taskMoniter = new TaskMoniter(configs.task_list_dir);
     const tajian = new TaJian(configs.data_save_dir);
 
     taskMoniter.run();      //监控新任务
 
+    //HeroUnion英雄联盟对接
+    let heroUnionConfig = configs.herounion;
+    let heroBot = new HeroBot(
+            heroUnionConfig.server_url,
+            heroUnionConfig.name,
+            heroUnionConfig.description,
+            heroUnionConfig.platforms,
+            heroUnionConfig.contracts,
+            heroUnionConfig.country,
+            heroUnionConfig.lang,
+            heroUnionConfig.contact,
+            heroUnionConfig.data_mode
+        );
 
-    const heroCloudServer = 'ws://192.168.3.13:1818';
+
+    //配置本地cloud server地址，cloud安装参考：./install_cloud.sh
+    const heroCloudServer = typeof(configs.cloud_server) != 'undefined' && configs.cloud_server ? configs.cloud_server : '';
 
     //spider run
-    let spider_is_running = false;
+    let spider_is_running = false,
+        last_run_time = 0;
     const task_check_time = 20;     //每 20 秒抓取一次
     const task_auto_run = cron.schedule(`*/${task_check_time} * * * * *`, async () =>  {
-        if (spider_is_running == true) {return false;}      //避免同时执行多个爬虫任务
+        const current_time = common.getTimestampInSeconds();
+
+        //避免同时执行多个爬虫任务，并检查上个任务执行是否超时
+        if (spider_is_running == true && current_time - last_run_time < configs.task_do_timeout) {
+            return false;
+        }
 
         const task = taskMoniter.getNewTask();
         if (!task) {return false;}
+
+        let logFile = path.resolve(configs.task_log_dir) + `/tasks_${heroUnionConfig.name}.log`;
+        await common.saveLog(logFile, JSON.stringify(task) + "\n");
 
         const botName = common.getBotName(task.url);
         console.log('New task %s handle by bot %s.', task.url, botName);
@@ -53,28 +84,51 @@ import cron from 'node-cron';
 
         if (bot) {
             spider_is_running = true;
+            last_run_time = common.getTimestampInSeconds();
 
             taskMoniter.setTaskRunning(task.id);
             const data = await bot.scrap(task.url);
             //console.log('Data got by bot', data);
 
             if (typeof(data.done) != 'undefined' && data.done == true) {
+                task.data = data;        //把抓取到的数据保存到任务里
+                taskMoniter.updateTask(task.id, task);
+
                 if (
                     await tajian.saveUrlShortcut(task.id, data)
                     && await tajian.saveDescriptionFiles(task.id, data)
                 ) {
+                    //马上回传一次数据
+                    taskMoniter.notifyHandle(task);
+
+                    //标记任务完成
                     taskMoniter.setTaskDone(task.id);
                 }else {
                     taskMoniter.setTaskFailed(task.id);
                 }
             }else {
-                taskMoniter.setTaskFailed(task.id);
+                //失败后最多重试 5 次
+                if (typeof(task.fail_retry) == 'undefined') {
+                    task.fail_retry = 0;
+                }else {
+                    task.fail_retry ++;
+                }
+
+                taskMoniter.updateTask(task.id, task);
+
+                if (task.fail_retry > configs.max_fail_retry) {
+                    taskMoniter.setTaskFailed(task.id);
+
+                    //上报联盟，任务失败
+                    heroBot.saveTaskData(task.id, task.token, [], 'failed');
+                }else {
+                    taskMoniter.setTaskWaiting(task.id);        //重新进入等待处理状态
+                }
             }
 
             spider_is_running = false;
         }else {
             console.error('No bot matched with url %s', task.url);
-            taskMoniter.setTaskRunning(task.id);
             taskMoniter.setTaskFailed(task.id);
         }
     }, {
@@ -84,7 +138,19 @@ import cron from 'node-cron';
     task_auto_run.start();
     console.log('[%s] Spider started.', common.getTimeString());
 
+
+    //爬虫心跳上报
+    const heartBeatFrequence = 5;    //5 分钟上报一次
+    const heroUnionHeartBeat = cron.schedule(`*/${heartBeatFrequence} * * * *`, async () =>  {
+        let status = spider_is_running ? 'busy' : 'idle';
+        const res = await heroBot.heartBeat(status);
+        console.log('HeroUnion bot heart beat result', res);
+    }, {scheduled: false});
+    heroUnionHeartBeat.start();
+
+    let heartBeatRes = await heroBot.heartBeat('idle');        //马上上报一次
+    console.log('[%s] HeroUnion bot heart beat started.', common.getTimeString(), heartBeatRes);
 })().catch(error => {
-  console.error("Spider error got:\n%s", error);
-  process.exit(1);
+    console.error("Spider error got:\n%s", error);
+    process.exit(1);
 });
