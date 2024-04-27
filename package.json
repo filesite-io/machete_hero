@@ -9,6 +9,9 @@
     },
     "license": "MIT",
     "type": "module",
+    "engines": {
+        "node": ">=18"
+    },
     "dependencies": {
         "@ulixee/cloud": "^2.0.0-alpha.24",
         "@ulixee/hero": "^2.0.0-alpha.24",
