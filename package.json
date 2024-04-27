@@ -1,5 +1,13 @@
 {
-    "name": "machege-hero",
+    "name": "machete-hero",
+    "description": "Hero bot for machete, and implements api of HeroUnion: https://herounion.filesite.io.",
+    "version": "0.0.2",
+    "author": "filesite.io",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/filesite-io/machete_hero.git"
+    },
+    "license": "MIT",
     "type": "module",
     "dependencies": {
         "@ulixee/cloud": "^2.0.0-alpha.24",
