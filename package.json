@@ -1,5 +1,5 @@
 {
-    "name": "machete-hero",
+    "name": "@filesite/machete-hero",
     "description": "Hero bot for machete, and implements api of HeroUnion: https://herounion.filesite.io.",
     "version": "0.0.2",
     "author": "filesite.io",
