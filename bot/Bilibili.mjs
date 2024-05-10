@@ -10,8 +10,10 @@ class Bilibili extends HeroBot {
 
         let options = {
             userAgent: configs.userAgent,
-            viewport: configs.viewport
+            viewport: configs.viewport,
         };
+
+        options = common.mergeConfigs(configs.botOptions, options);
 
         if (this.heroServer) {
             options.connectionToCore = this.heroServer;
@@ -42,7 +44,7 @@ class Bilibili extends HeroBot {
                       text => text != '',
                     );
                 }
-            });
+            }, {timeoutMs: configs.heroTabOptions.timeoutMs});
 
             //解析网页HTML数据
             data.title = await hero.document.title;
@@ -85,6 +87,8 @@ class Bilibili extends HeroBot {
         }catch(error) {
             console.error("Error got when request %s via hero: %s", url, error);
             await hero.close();
+            //删除profile文件后重试
+            await this.deleteProfile();
         }
 
         return data;

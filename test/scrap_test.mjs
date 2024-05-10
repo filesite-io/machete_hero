@@ -2,24 +2,26 @@ import Douyin from '../bot/Douyin.mjs';
 import Kuaishou from '../bot/Kuaishou.mjs';
 import Xigua from '../bot/Xigua.mjs';
 import Bilibili from '../bot/Bilibili.mjs';
-import configs from '../config.mjs';
+import getConfigs from '../config.mjs';
 
 (async () => {
+    //设置configs为全局变量
+    global.configs = await getConfigs();
+
     let test_bot = 'douyin';
     if (process.argv.length == 3) {
         test_bot = process.argv[2];
     }
     console.log('当前测试Bot：%s', test_bot);
 
-    const heroCloudServer = 'ws://192.168.3.13:1818';
+    const heroCloudServer = 'ws://127.0.0.1:1818';
     let url = '', data = {};
 
     switch(test_bot) {
 
         case 'douyin':
             //抖音测试
-            url = 'https://v.douyin.com/ieUpFCva/';     //mob and pc
-            url = 'https://v.douyin.com/i8sEyb6/';     //mob and pc
+            url = 'https://v.douyin.com/i2PBaR5B/';     //mob and pc
 
             configs.heroTabOptions.timeoutMs = 20000;   //所有内容加载完成超时
 
@@ -29,6 +31,10 @@ import configs from '../config.mjs';
             console.log('Hero配置', configs);
 
             const douyin = new Douyin(heroCloudServer);
+
+            //使用手机模式，默认为pc
+            douyin.setMode('mob');
+
             console.log('请求中: %s ...', url);
             data = await douyin.scrap(url);
             console.log("解析结果:\n%s", JSON.stringify(data));
@@ -59,7 +65,7 @@ import configs from '../config.mjs';
         case 'xigua':
             //西瓜测试
             url = 'https://v.ixigua.com/ieUaqrFN/';       //mobile
-            url = 'https://www.ixigua.com/7248225527335813636';     //pc
+            url = 'https://www.ixigua.com/7343928492197118518';     //pc
 
             configs.heroBotOptions.referrer = url;
             configs.userAgent = configs.userAgents.mac_chrome;

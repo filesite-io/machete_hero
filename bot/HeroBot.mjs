@@ -1,8 +1,10 @@
 import Hero from '@ulixee/hero';
 import fs from 'node:fs';
+import {unlink} from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'url';
 import ClientLogPlugin from '../plugin/ClientLogPlugin.mjs';
+import common from '../lib/common.mjs';
 
 class HeroBot {
     constructor(heroCloudServer) {
@@ -19,6 +21,13 @@ class HeroBot {
 
         const __filename = fileURLToPath(import.meta.url);
         this.root = path.dirname(__filename);
+
+        //记录浏览器模式，便于在需要的时候切换
+        this.ua = 'pc';
+    }
+
+    setMode(mode) {
+        this.ua = mode == 'mob' ? 'mob' : 'pc';
     }
 
     //返回profile对象
@@ -33,8 +42,10 @@ class HeroBot {
 
         let options = {
             userAgent: configs.userAgent,
-            viewport: configs.viewport
+            viewport: configs.viewport,
         };
+
+        options = common.mergeConfigs(configs.botOptions, options);
 
         if (this.heroServer) {
             options.connectionToCore = this.heroServer;
@@ -55,7 +66,7 @@ class HeroBot {
 
             //等待所有内容加载完成
             const tab = await hero.activeTab;
-            await tab.waitForLoad('AllContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
+            await tab.waitForLoad('DomContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
 
             //保存profile
             const latestUserProfile = await hero.exportUserProfile();
@@ -85,6 +96,25 @@ class HeroBot {
             fs.writeFileSync(profilePath, JSON.stringify(profile, null, 2));
         }catch(error) {
             console.error("Error got when save profile of %s, error detail:\n%s", botName, error);
+            return false;
+        }
+
+        return true;
+    }
+
+    //删除profile
+    async deleteProfile() {
+        if (this.name == '') {return false;}
+
+        const botName = this.name;
+
+        try {
+            const profilePath = path.resolve(this.root, '../tmp/', `profile_${botName}.json`);
+            if (fs.existsSync(profilePath) != false) {
+                return await unlink(profilePath);
+            }
+        }catch(error) {
+            console.error("Error got when delete profile of %s, error detail:\n%s", botName, error);
             return false;
         }
 

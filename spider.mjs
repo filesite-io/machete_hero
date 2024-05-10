@@ -70,6 +70,7 @@ import path from 'node:path';
         switch (botName) {
             case 'douyin':
                 bot = new Douyin(heroCloudServer);
+                bot.setMode('mob');     //使用手机模式
                 break;
             case 'kuaishou':
                 bot = new Kuaishou(heroCloudServer);

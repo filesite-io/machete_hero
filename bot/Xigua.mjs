@@ -10,8 +10,10 @@ class Xigua extends HeroBot {
 
         let options = {
             userAgent: configs.userAgent,
-            viewport: configs.viewport
+            viewport: configs.viewport,
         };
+
+        options = common.mergeConfigs(configs.botOptions, options);
 
         if (this.heroServer) {
             options.connectionToCore = this.heroServer;
@@ -35,11 +37,10 @@ class Xigua extends HeroBot {
             //等待所有内容加载完成
             const tab = await hero.activeTab;
             await tab.waitForLoad('AllContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
-            await hero.waitForPaintingStable();
+            await hero.waitForPaintingStable({timeoutMs: configs.heroTabOptions.timeoutMs});
 
             //解析网页HTML数据
             data.title = await hero.document.title;
-            //data.url = await hero.url;
 
             const elems = await hero.document.querySelectorAll('meta');
             let meta_name = '';
@@ -52,6 +53,15 @@ class Xigua extends HeroBot {
                     data.cover = await elem.getAttribute('content');
                 }else if (meta_name.indexOf('og:title') > -1) {
                     data.title = await elem.getAttribute('content');
+                }
+            }
+
+            //尝试从 <xg-poster class="xgplayer-poster hide"> 再获取一次
+            if (typeof(data.cover) == 'undefined' || !data.cover)  {
+                const imgTag = await tab.querySelector('xg-poster');
+                let backgroundCss = await imgTag.style.backdgroundImage;
+                if (backgroundCss && /url\(.+\)/i.test(backgroundCss)) {
+                    data.cover = backgroundCss.replace('url(', '').replace(')', '').replace('"', '');
                 }
             }
 
@@ -75,6 +85,8 @@ class Xigua extends HeroBot {
         }catch(error) {
             console.error("Error got when request %s via hero: %s", url, error);
             await hero.close();
+            //删除profile文件后重试
+            await this.deleteProfile();
         };
 
         return data;
