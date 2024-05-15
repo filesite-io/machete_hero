@@ -36,7 +36,7 @@ class Xigua extends HeroBot {
 
             //等待所有内容加载完成
             const tab = await hero.activeTab;
-            await tab.waitForLoad('AllContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
+            await tab.waitForLoad('DomContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
             await hero.waitForPaintingStable({timeoutMs: configs.heroTabOptions.timeoutMs});
 
             //解析网页HTML数据
