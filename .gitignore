@@ -8,3 +8,4 @@ data/*.jpg
 data/*.jpeg
 data/*.png
 data/*.txt
+log/tasks_machete_hero.log

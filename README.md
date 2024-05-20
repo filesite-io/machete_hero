@@ -7,10 +7,11 @@ Hero scripts of machete.
 
 支持以下平台视频分享网页数据抓取：
 
-* 抖音网页版
-* 快手网页版
-* 西瓜视频网页版
-* Bilibili
+* bilibili 	- Bilibili，B站
+* douyin 	- 抖音网页版
+* kuaishou 	- 快手网页版
+* xigua 	- 西瓜视频网页版
+* website 	- 任意网页
 
 
 爬虫采集到的数据结构见Machete项目的TaJian皮肤文档，目前实现了以下几个属性：
@@ -21,18 +22,19 @@ Hero scripts of machete.
 
 ## 目录/文件说明
 
-* bot - 针对各大平台的网页HTML解析类
-* bypass - 针对各大平台的常用域名收集
-* lib - 公用类
-* plugin - Hero插件
-* data - TaJian爬虫数据保存目录
-* todo - TaJian爬虫任务保存目录
-* test - 类库测试代码
-* tmp - 临时文件保存目录
-* install_cloud.sh - hero服务端安装（非必需）
-* install_hero.sh - hero客户端安装
-* config.mjs - 爬虫配置文件
-* spider.mjs - TaJian爬虫主程序
+* bot 		- 针对各大平台的网页HTML解析类
+* bypass 	- 针对各大平台的常用域名收集
+* lib 		- 公用类
+* plugin 	- Hero插件
+* data 		- TaJian爬虫数据保存目录
+* todo 		- TaJian爬虫任务保存目录
+* test 		- 类库测试代码
+* tmp 		- 临时文件保存目录
+* install_cloud.sh 	- hero服务端安装（非必需）
+* install_hero.sh 	- hero客户端安装
+* start_cloud.sh 	- hero服务端启动
+* config.mjs 		- 爬虫配置文件
+* spider.mjs 		- TaJian爬虫主程序
 
 
 ## 使用方法
@@ -52,7 +54,13 @@ npm install
 如果你对npm和node不熟悉，请自行了解。
 
 
-3. 执行下面命令启动爬虫
+3. 执行下面命令启动Hero Cloud
+```
+./start_cloud.sh
+```
+
+
+4. 执行下面命令启动爬虫spider.mjs
 ```
 npm start
 ```
@@ -64,8 +72,13 @@ npm start -- config_custom.json
 
 在目录todo/里创建任务文件，爬虫检测到新任务后自动抓取数据并保存到data/目录下。
 
+手动添加任务命令示例：
+```
+echo "https://tajian.tv" > todo/test_01.task
+```
 
-4. 二次开发
+
+## 二次开发
 
 写一个.mjs脚本，调用bot/下的类库，实现目标网页访问和解析获取所需数据。
 

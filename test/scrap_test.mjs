@@ -2,6 +2,7 @@ import Douyin from '../bot/Douyin.mjs';
 import Kuaishou from '../bot/Kuaishou.mjs';
 import Xigua from '../bot/Xigua.mjs';
 import Bilibili from '../bot/Bilibili.mjs';
+import WebCrawler from '../bot/WebCrawler.mjs';
 import getConfigs from '../config.mjs';
 
 (async () => {
@@ -14,7 +15,7 @@ import getConfigs from '../config.mjs';
     }
     console.log('当前测试Bot：%s', test_bot);
 
-    const heroCloudServer = 'ws://127.0.0.1:1818';
+    let heroCloudServer = 'ws://127.0.0.1:1818';    
     let url = '', data = {};
 
     switch(test_bot) {
@@ -99,6 +100,26 @@ import getConfigs from '../config.mjs';
             const bilibili = new Bilibili(heroCloudServer);
             console.log('请求中: %s ...', url);
             data = await bilibili.scrap(url);
+            console.log("解析结果:\n%s", JSON.stringify(data));
+
+            break;
+
+        default:
+            //普通网站
+            url = 'https://www.baidu.com';
+            url = 'https://www.zhihu.com';
+            url = 'https://ogp.me/';
+            url = 'https://www.zhihu.com/signin?next=%2F';
+
+            configs.heroTabOptions.timeoutMs = 20000;   //所有内容加载完成超时
+
+            configs.userAgent = configs.userAgents.mac_chrome;
+            configs.viewport = configs.viewports.pc;
+
+            console.log('Hero配置', configs);
+            const crawler = new WebCrawler(heroCloudServer, 'webcrawler');
+            console.log('请求中: %s ...', url);
+            data = await crawler.scrap(url);
             console.log("解析结果:\n%s", JSON.stringify(data));
 
             break;

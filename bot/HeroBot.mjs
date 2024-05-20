@@ -7,7 +7,7 @@ import ClientLogPlugin from '../plugin/ClientLogPlugin.mjs';
 import common from '../lib/common.mjs';
 
 class HeroBot {
-    constructor(heroCloudServer) {
+    constructor(heroCloudServer, botName) {
         this.heroServer = heroCloudServer ? heroCloudServer : '';
 
         this.supportedBots = {
@@ -15,9 +15,10 @@ class HeroBot {
             kuaishou: 'https://www.kuaishou.com',
             xigua: 'https://www.ixigua.com',
             bilibili: 'https://www.bilibili.com',
+            webcrawler: 'for_all_web_sites',
         };
 
-        this.name = '';
+        this.name = typeof(botName) != 'undefined' && botName ? botName : '';
 
         const __filename = fileURLToPath(import.meta.url);
         this.root = path.dirname(__filename);

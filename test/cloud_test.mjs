@@ -1,7 +1,7 @@
 import Hero from '@ulixee/hero';
 
 (async () => {
-  const hero = new Hero({ connectionToCore: 'ws://192.168.3.13:1818' });
+  const hero = new Hero({ connectionToCore: 'ws://127.0.0.1:1818' });
 
   //const url = 'https://filesite.io';
   //const url = 'https://www.google.com';

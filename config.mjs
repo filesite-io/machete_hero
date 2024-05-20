@@ -12,9 +12,9 @@ let configs = {
     //HeroUnion英雄联盟对接配置
     herounion: {
         server_url: 'https://herounion.filesite.io',                //联盟服务地址
-        name: 'machete_hero',                               //爬虫名字
-        description: '支持Machete的TaJian皮肤的hero爬虫',      //爬虫简介
-        platforms: 'douyin,kuaishou,xigua,bilibili',        //爬虫支持的平台
+        name: 'machete_hero',                                       //爬虫名字
+        description: '支持Machete的TaJian皮肤的hero爬虫',             //爬虫简介
+        platforms: 'douyin,kuaishou,xigua,bilibili,website',        //爬虫支持的平台
         contracts: 'tajiantv',                              //爬虫支持的数据采集合约（可二次开发自定义）
         country: 'cn',                                      //爬虫所在国家
         lang: 'zh',                                         //爬虫支持的语言
@@ -26,13 +26,15 @@ let configs = {
 
 
     //bot相关配置
-    cloud_server: '',
+    cloud_server: 'ws://127.0.0.1:1818',
     default_mode: 'pc',
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
     viewport: {
         width: 1440,
         height: 900
     },
+
+    minImageNaturalWidth: 50,      //从<img>标签抓取封面图时的图片原始尺寸最小宽度
 
     //可选项参考官方文档：https://ulixee.org/docs/hero/basic-client/hero
     botOptions: {

@@ -15,6 +15,7 @@ import Douyin from './bot/Douyin.mjs';
 import Kuaishou from './bot/Kuaishou.mjs';
 import Xigua from './bot/Xigua.mjs';
 import Bilibili from './bot/Bilibili.mjs';
+import WebCrawler from './bot/WebCrawler.mjs';
 
 import cron from 'node-cron';
 import path from 'node:path';
@@ -65,7 +66,7 @@ import path from 'node:path';
         await common.saveLog(logFile, JSON.stringify(task) + "\n");
 
         const botName = common.getBotName(task.url);
-        console.log('New task %s handle by bot %s.', task.url, botName);
+        console.log('New task %s handle by bot %s, url: %s, cloud server: %s', task.id, botName, task.url, heroCloudServer);
         let bot = null;
         switch (botName) {
             case 'douyin':
@@ -81,13 +82,19 @@ import path from 'node:path';
             case 'bilibili':
                 bot = new Bilibili(heroCloudServer);
                 break;
+
+            default:
+                bot = new WebCrawler(heroCloudServer, botName);
+                break;
         }
 
         if (bot) {
+            console.log('Spider craping...');
+
             spider_is_running = true;
             last_run_time = common.getTimestampInSeconds();
 
-            taskMoniter.setTaskRunning(task.id);
+            let taskStarted = taskMoniter.setTaskRunning(task.id);
             const data = await bot.scrap(task.url);
             //console.log('Data got by bot', data);
 
