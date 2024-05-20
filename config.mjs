@@ -76,10 +76,9 @@ let configs = {
 
 };
 
-async function getConfig() {
+async function getConfig(configFile) {
     //自定义JSON格式配置文件支持
-    if (process.argv.length >= 3) {
-        let configFile = process.argv[2];
+    if (typeof(configFile) != 'undefined' && configFile) {
         let myConfigs = await common.loadCustomizeConfig(configFile);
         if (myConfigs) {
             configs = common.mergeConfigs(myConfigs, configs);

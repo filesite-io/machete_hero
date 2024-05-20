@@ -1,6 +1,8 @@
 import Hero from '@ulixee/hero';
 
 (async () => {
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
   const hero = new Hero({
     connectionToCore: 'ws://127.0.0.1:1818',
 
@@ -24,7 +26,9 @@ import Hero from '@ulixee/hero';
     showChromeAlive: true,
   });
 
-  const url = 'https://v.douyin.com/i2PBaR5B/';
+    let url = 'https://v.douyin.com/i2PBaR5B/';
+    //直播地址测试
+    url = 'https://v.douyin.com/i2WaMoAN/';
   console.log("请求 %s 中。。。", url);
   await hero.goto(url, {
     timeoutMs: 60000,
@@ -42,15 +46,17 @@ import Hero from '@ulixee/hero';
   //await tab.waitForLoad('AllContentLoaded', {timeoutMs: 30000});
   await tab.waitForLoad('DomContentLoaded', {timeoutMs: 30000});
 
-  //await hero.waitForState({
-  //      all(assert) {
-  //          assert(
-  //            hero.detach( hero.document.querySelectorAll('img.poster') ),
-  //            els => els && els.length > 0,
-  //          );
-  //      }
-  //  }, {timeoutMs: 20000});
-  //console.log('poster封面图标签已经准备好');
+  /*
+  await hero.waitForState({
+      all(assert) {
+          assert(
+            hero.detach( hero.document.querySelectorAll('img.poster') ),
+            els => els && els.length > 0,
+          );
+      }
+  }, {timeoutMs: 20000});
+  console.log('poster封面图标签已经准备好');
+  */
 
   console.log('加载完成', await hero.isPaintingStable, await hero.isDomContentLoaded, await hero.isAllContentLoaded);
 
@@ -59,16 +65,26 @@ import Hero from '@ulixee/hero';
     let doc_url = await hero.document.location.href;
   console.log('网址', doc_url);
 
+    let rnd_secods = parseInt(Math.random() * 20);
+    console.log("Sleep %s seconds...", rnd_secods);
+    await delay(1000*rnd_secods);      //sleep
+
+
     //let doc_html = await hero.document.body.innerHTML;
   //console.log('网页内容', doc_html);
 
     let title = await hero.document.title;
   console.log('网页标题', title);
 
-  const elem = await hero.querySelector('.video-container img.poster');
+  let elem = await hero.querySelector('.video-container img.poster');
+  elem = await hero.querySelector('.xgplayer video');
+
   let imgUrl = '';
-    imgUrl = await elem.src;
-    console.log('post image url: %s', imgUrl);
+    //imgUrl = await elem.src;
+    if (elem) {
+        imgUrl = await elem.poster;
+        console.log('post image url: %s', imgUrl);
+    }
 
   //const elems = await hero.detach( hero.document.querySelectorAll('meta') );
   //const elems = await hero.document.querySelectorAll('meta');
@@ -85,7 +101,7 @@ import Hero from '@ulixee/hero';
   //  }
   //}
 
-  await hero.close();
+    await hero.close();
 })().catch(error => {
   console.error("Error got:\n%s", error);
   process.exit(1);

@@ -24,17 +24,21 @@ import getConfigs from '../config.mjs';
             //抖音测试
             url = 'https://v.douyin.com/i2PBaR5B/';     //mob and pc
 
+            //直播地址测试
+            url = 'https://v.douyin.com/i2WaMoAN/';
+            //已结束直播
+            url = 'https://v.douyin.com/i2W5TV4e/';
+
             configs.heroTabOptions.timeoutMs = 20000;   //所有内容加载完成超时
 
-            configs.userAgent = configs.userAgents.mac_chrome;
-            configs.viewport = configs.viewports.pc;
-
-            console.log('Hero配置', configs);
+            //configs.userAgent = configs.userAgents.mac_chrome;
+            //configs.viewport = configs.viewports.pc;
 
             const douyin = new Douyin(heroCloudServer);
 
             //使用手机模式，默认为pc
             douyin.setMode('mob');
+            console.log('Hero配置', configs);
 
             console.log('请求中: %s ...', url);
             data = await douyin.scrap(url);

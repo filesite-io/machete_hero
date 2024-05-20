@@ -22,7 +22,11 @@ import path from 'node:path';
 
 (async () => {
     //设置configs为全局变量
-    global.configs = await getConfigs();
+    let configFile = '';
+    if (process.argv.length >= 3) {
+        configFile = process.argv[2];
+    }
+    global.configs = await getConfigs(configFile);
 
     const taskMoniter = new TaskMoniter(configs.task_list_dir);
     const tajian = new TaJian(configs.data_save_dir);

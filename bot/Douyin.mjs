@@ -59,22 +59,38 @@ class Douyin extends HeroBot {
                 }, {timeoutMs: configs.heroTabOptions.timeoutMs});
             }
 
+            let rnd_secods = 10 + parseInt(Math.random() * 10);
+            console.log("Sleep %s seconds...", rnd_secods);
+            await common.delay(rnd_secods);
 
             //解析网页HTML数据
             data.title = await hero.document.title;
 
             if (this.ua == 'mob') {
                 //手机版网页解析
-                const imgElem = await hero.querySelector('.video-container img.poster');
+                let imgElem = await hero.querySelector('.video-container img.poster');
+                let elType = 'image';
                 if (!imgElem) {
-                    console.error('HTML解析出错，找不到封面图', data);
-                    await hero.close();
-                    //删除profile文件后重试
-                    await this.deleteProfile();
-                    return false;
+                    //尝试去抓取video的poster属性
+                    imgElem = await hero.querySelector('.xgplayer video');
+                    elType = 'video';
+
+                    if (!imgElem) {
+                        //尝试获取用户头像作为封面图，兼容直播已结束页面
+                        imgElem = await hero.querySelector('.reflow-content img');
+                        elType = 'image';
+
+                        if (!imgElem) {
+                            console.error('HTML解析出错，找不到封面图', data);
+                            await hero.close();
+                            //删除profile文件后重试
+                            await this.deleteProfile();
+                            return false;
+                        }
+                    }
                 }
 
-                data.cover = await imgElem.src;
+                data.cover = elType == 'image' ? await imgElem.src : await imgElem.poster;
             }else {
                 //pc版网页解析
                 const elems = await hero.document.querySelectorAll('meta');
