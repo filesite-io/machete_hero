@@ -39,13 +39,25 @@ class Kuaishou extends HeroBot {
             await tab.waitForLoad('DomContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
             await hero.waitForPaintingStable({timeoutMs: configs.heroTabOptions.timeoutMs});
 
+            let rnd_secods = 10 + parseInt(Math.random() * 10);
+            console.log("Sleep %s seconds...", rnd_secods);
+            await common.delay(rnd_secods);
+
             //解析网页HTML数据
             data.title = await hero.document.title;
             //data.url = await hero.url;
 
-            const elem = hero.document.querySelector('.video-container-player');
+            let elem = await hero.querySelector('.video-container-player');
             if (elem) {
                 data.cover = await elem.getAttribute('poster');
+            }
+
+            //增加直播页面的支持，抓取用户的头像做封面图
+            if (typeof(data.cover) == 'undefined' || !data.cover) {
+                elem = await hero.querySelector('.tran .flex img.rounded.ml-10');
+                if (elem) {
+                    data.cover = await elem.src;
+                }
             }
 
             //get cover image's base64 data

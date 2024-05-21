@@ -52,6 +52,8 @@ import getConfigs from '../config.mjs';
             url = 'https://www.kuaishou.com/f/X8FTguiIjZQVwE7';     //pc
             //url = 'https://v.kuaishou.com/7zwqe6';      //mob
 
+            url = 'https://v.kuaishou.com/EvxOVx';
+
             configs.heroTabOptions.timeoutMs = 20000;   //所有内容加载完成超时
 
             configs.userAgent = configs.userAgents.mac_chrome;
@@ -93,6 +95,9 @@ import getConfigs from '../config.mjs';
             //B站测试
             url = 'https://www.bilibili.com/video/BV1ep4y1J75y/?share_source=copy_web&vd_source=00bead49a4c2df31bbf3e609d7d95899'; //pc
             url = 'https://b23.tv/Lo0jIEt';       //mob
+
+            //正在直播页面
+            url = 'https://b23.tv/EnwbTKc';
 
             configs.heroTabOptions.timeoutMs = 20000;   //所有内容加载完成超时
 

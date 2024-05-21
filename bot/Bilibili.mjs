@@ -39,6 +39,10 @@ class Bilibili extends HeroBot {
             await tab.waitForLoad('DomContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
             await hero.waitForPaintingStable({timeoutMs: configs.heroTabOptions.timeoutMs});
 
+            let rnd_secods = 10 + parseInt(Math.random() * 10);
+            console.log("Sleep %s seconds...", rnd_secods);
+            await common.delay(rnd_secods);
+
             //解析网页HTML数据
             data.title = await hero.document.title;
             //data.url = await hero.url;
@@ -57,12 +61,47 @@ class Bilibili extends HeroBot {
                 }
             }
 
+            //支持正在直播页面
+            if (typeof(data.cover) == 'undefined' || !data.cover) {
+                console.log('Try to get video poster...');
+                let videoElem = await hero.querySelector('.live-player-mounter video');
+                let posterDiv = await videoElem.nextSibling;
+                if (posterDiv) {
+                    let styleDeclaration = await posterDiv.style;
+                    if (styleDeclaration) {
+                        let backgroundImage = await styleDeclaration.getPropertyValue("background-image");
+                        //console.log('Poster element find', backgroundImage);
+                        backgroundImage = backgroundImage.replace('url("', '').replace('")', '');
+                        data.cover_type = common.getImageType(backgroundImage);
+                        data.cover_base64 = backgroundImage.replace(/^data:image\/[a-z]+;base64,/i, '');
+                    }
+                }
+            }
+
+            //支持已结束直播
+            if (
+                (typeof(data.cover) == 'undefined' || !data.cover)
+                &&
+                (typeof(data.cover_base64) == 'undefined' || !data.cover_base64)
+            ) {
+                console.log('Try to get avatar...');
+                let avatarElem = await hero.querySelector('.blive-avatar-face');
+                if (avatarElem) {
+                    let styleDeclaration = await avatarElem.style;
+                    if (styleDeclaration) {
+                        let backgroundImage = await styleDeclaration.getPropertyValue("background-image");
+                        //console.log('Avatar element find', backgroundImage);
+                        data.cover = backgroundImage.replace('url("', '').replace('")', '');
+                    }
+                }
+            }
+
             //get cover image's base64 data
             //sample: //i1.hdslb.com/bfs/archive/ef6204c8788134064dc6b7e8cb20870f1341e604.jpg@100w_100h_1c.png
             //替换成：//i1.hdslb.com/bfs/archive/ef6204c8788134064dc6b7e8cb20870f1341e604.jpg@480w_270h_1c.png
             if (typeof(data.cover) != 'undefined' && data.cover) {
                 data.cover = common.getAbsoluteUrl(data.cover);
-                data.cover = data.cover.replace(/@[\w]+\./ig, '@480w_270h_1c.');
+                data.cover = data.cover.replace(/@[\w]+\./ig, '@480w_270h_1c.');    //获取480x270尺寸图片
 
                 const response = await hero.goto(data.cover);
                 const imgBuffer = await response.buffer;

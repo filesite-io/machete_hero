@@ -39,6 +39,10 @@ class Xigua extends HeroBot {
             await tab.waitForLoad('DomContentLoaded', {timeoutMs: configs.heroTabOptions.timeoutMs});
             await hero.waitForPaintingStable({timeoutMs: configs.heroTabOptions.timeoutMs});
 
+            let rnd_secods = 10 + parseInt(Math.random() * 10);
+            console.log("Sleep %s seconds...", rnd_secods);
+            await common.delay(rnd_secods);
+
             //解析网页HTML数据
             data.title = await hero.document.title;
 
