@@ -63,8 +63,18 @@ import path from 'node:path';
             return false;
         }
 
+        //随机延迟一段时间，将不同爬虫的执行时间错开
+        let rnd_secods = parseInt(Math.random() * task_check_time);
+        console.log("Sleep %s seconds before crap...", rnd_secods);
+        await common.delay(rnd_secods);
+
+
         const task = taskMoniter.getNewTask();
         if (!task) {return false;}
+
+        //标记爬虫开始执行任务
+        spider_is_running = true;
+        last_run_time = common.getTimestampInSeconds();
 
         let logFile = path.resolve(configs.task_log_dir) + `/tasks_${heroUnionConfig.name}.log`;
         await common.saveLog(logFile, JSON.stringify(task) + "\n");
@@ -94,9 +104,6 @@ import path from 'node:path';
 
         if (bot) {
             console.log('Spider craping...');
-
-            spider_is_running = true;
-            last_run_time = common.getTimestampInSeconds();
 
             let taskStarted = taskMoniter.setTaskRunning(task.id);
             const data = await bot.scrap(task.url);
@@ -141,6 +148,7 @@ import path from 'node:path';
             spider_is_running = false;
         }else {
             console.error('No bot matched with url %s', task.url);
+            spider_is_running = false;
             taskMoniter.setTaskFailed(task.id);
         }
     }, {
@@ -154,6 +162,11 @@ import path from 'node:path';
     //爬虫心跳上报
     const heartBeatFrequence = 5;    //5 分钟上报一次
     const heroUnionHeartBeat = cron.schedule(`*/${heartBeatFrequence} * * * *`, async () =>  {
+        //随机延迟一段时间，将不同爬虫的执行时间错开
+        let rnd_secods = parseInt(Math.random() * 60);
+        console.log("Sleep %s seconds before send heart beat...", rnd_secods);
+        await common.delay(rnd_secods);
+
         let status = spider_is_running ? 'busy' : 'idle';
         const res = await heroBot.heartBeat(status);
         console.log('HeroUnion bot heart beat result', res);
