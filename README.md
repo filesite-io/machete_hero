@@ -30,7 +30,7 @@ Hero scripts of machete.
 * todo 		- TaJian爬虫任务保存目录
 * test 		- 类库测试代码
 * tmp 		- 临时文件保存目录
-* install_cloud.sh 	- hero服务端安装（非必需）
+* install_cloud.sh 	- hero服务端安装
 * install_hero.sh 	- hero客户端安装
 * start_cloud.sh 	- hero服务端启动
 * config.mjs 		- 爬虫配置文件
