@@ -99,7 +99,7 @@ class Bilibili extends HeroBot {
             //get cover image's base64 data
             //sample: //i1.hdslb.com/bfs/archive/ef6204c8788134064dc6b7e8cb20870f1341e604.jpg@100w_100h_1c.png
             //替换成：//i1.hdslb.com/bfs/archive/ef6204c8788134064dc6b7e8cb20870f1341e604.jpg@480w_270h_1c.png
-            if (typeof(data.cover) != 'undefined' && data.cover) {
+            if (typeof(data.cover) != 'undefined' && data.cover && /^data:image\/[a-z]+;base64,/i.test(data.cover) == false) {
                 data.cover = common.getAbsoluteUrl(data.cover);
                 data.cover = data.cover.replace(/@[\w]+\./ig, '@480w_270h_1c.');    //获取480x270尺寸图片
 
@@ -110,6 +110,10 @@ class Bilibili extends HeroBot {
                     data.cover_base64 = imgBuffer.toString('base64');
                     data.cover_type = common.getImageType(data.cover);
                 }
+            }else if ( typeof(data.cover) != 'undefined' && data.cover && /^data:image\/[a-z]+;base64,/i.test(data.cover) ) {
+                //support base64 image
+                data.cover_type = common.getImageType(data.cover);
+                data.cover_base64 = data.cover.replace(/^data:image\/[a-z]+;base64,/i, '');
             }
 
             await hero.close();

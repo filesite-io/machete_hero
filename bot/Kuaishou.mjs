@@ -61,7 +61,7 @@ class Kuaishou extends HeroBot {
             }
 
             //get cover image's base64 data
-            if (typeof(data.cover) != 'undefined' && data.cover) {
+            if (typeof(data.cover) != 'undefined' && data.cover && /^data:image\/[a-z]+;base64,/i.test(data.cover) == false) {
                 data.cover = common.getAbsoluteUrl(data.cover);
 
                 const response = await hero.goto(data.cover);
@@ -71,6 +71,10 @@ class Kuaishou extends HeroBot {
                     data.cover_base64 = imgBuffer.toString('base64');
                     data.cover_type = common.getImageType(data.cover);
                 }
+            }else if ( typeof(data.cover) != 'undefined' && data.cover && /^data:image\/[a-z]+;base64,/i.test(data.cover) ) {
+                //support base64 image
+                data.cover_type = common.getImageType(data.cover);
+                data.cover_base64 = data.cover.replace(/^data:image\/[a-z]+;base64,/i, '');
             }
 
             await hero.close();
