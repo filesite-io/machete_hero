@@ -1,0 +1,15 @@
+{
+    "herounion": {
+        "server_url": "https://herounion.filesite.io",
+        "name": "machete_hero",
+        "description": "支持TaJian.tv的hero爬虫",
+        "platforms": "douyin,kuaishou,xigua,bilibili,website",
+        "contracts": "tajiantv",
+        "country": "cn",
+        "lang": "zh",
+        "contact": "https://filesite.io",
+        "data_mode": "json",
+
+        "notify_max_try": 5
+    }
+}

@@ -34,7 +34,7 @@ let configs = {
         height: 900
     },
 
-    minImageNaturalWidth: 50,      //从<img>标签抓取封面图时的图片原始尺寸最小宽度
+    minImageNaturalWidth: 150,      //从<img>标签抓取封面图时的图片原始尺寸最小宽度
 
     //可选项参考官方文档：https://ulixee.org/docs/hero/basic-client/hero
     botOptions: {

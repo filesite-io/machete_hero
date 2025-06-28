@@ -72,14 +72,17 @@ class WebCrawler extends HeroBot {
 
             //2. <img>解析
             if (!data.cover) {
-                let minNaturalWidth = configs.minImageNaturalWidth ? configs.minImageNaturalWidth : 50;
+                let minNaturalWidth = configs.minImageNaturalWidth ? configs.minImageNaturalWidth : 200;
+                let imgSrc = '', imgType = '';
                 const imgElems = await hero.querySelectorAll('img');
                 if (imgElems) {
-                    data.cover = await imgElems[0].src;
-
                     for (const imgEl of imgElems) {
+                        //check image type supported
+                        imgSrc = await imgEl.src;
+                        imgType = common.getImageType(imgSrc);
+
                         //console.log('Completed: %s, naturalWidth: %s, width: %s', await imgEl.complete, await imgEl.naturalWidth, await imgEl.width);
-                        if (await imgEl.complete && await imgEl.naturalWidth >= minNaturalWidth) {
+                        if (imgType && await imgEl.complete && await imgEl.naturalWidth >= minNaturalWidth) {
                             data.cover = await imgEl.src;
                             //console.log('Cover got: %s', data.cover);
                             break;
