@@ -1,0 +1,15 @@
+{
+    "herounion": {
+        "server_url": "https://herounion.website",
+        "name": "hero_9527",
+        "description": "The web scraper supports parsing the title and the first image of any URL.",
+        "platforms": "website",
+        "contracts": "tajiantv",
+        "country": "cn",
+        "lang": "en",
+        "contact": "machete@filesite.io",
+        "data_mode": "json",
+
+        "notify_max_try": 5
+    }
+}

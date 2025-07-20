@@ -82,7 +82,7 @@ class WebCrawler extends HeroBot {
                         imgType = common.getImageType(imgSrc);
 
                         //console.log('Completed: %s, naturalWidth: %s, width: %s', await imgEl.complete, await imgEl.naturalWidth, await imgEl.width);
-                        if (imgType && await imgEl.complete && await imgEl.naturalWidth >= minNaturalWidth) {
+                        if (imgType && (imgType == 'jpeg' || imgType == 'png') && await imgEl.complete && await imgEl.naturalWidth >= minNaturalWidth) {
                             data.cover = await imgEl.src;
                             //console.log('Cover got: %s', data.cover);
                             break;
